@@ -3,6 +3,7 @@ pipeline {
 
     environment {
         PYTHON = 'C:\\Users\\user\\AppData\\Local\\Python\\bin\\python.exe'
+        WORKDIR = 'jenkins_project'
         VIRTUAL_ENV = 'venv'
     }
 
@@ -11,13 +12,9 @@ pipeline {
         stage('Setup') {
             steps {
                 script {
-                    // Create venv if it doesn't exist
-                    if (!fileExists("${VIRTUAL_ENV}")) {
-                        bat "\"%PYTHON%\" -m venv %VIRTUAL_ENV%"
-                    }
-
-                    // Activate venv and install dependencies
                     bat """
+                    cd %WORKDIR%
+                    \"%PYTHON%\" -m venv %VIRTUAL_ENV%
                     call %VIRTUAL_ENV%\\Scripts\\activate
                     \"%PYTHON%\" -m pip install -r requirements.txt
                     """
@@ -28,6 +25,7 @@ pipeline {
         stage('Lint') {
             steps {
                 bat """
+                cd %WORKDIR%
                 call %VIRTUAL_ENV%\\Scripts\\activate
                 flake8 app.py
                 """
@@ -37,6 +35,7 @@ pipeline {
         stage('Test') {
             steps {
                 bat """
+                cd %WORKDIR%
                 call %VIRTUAL_ENV%\\Scripts\\activate
                 pytest
                 """
@@ -46,6 +45,8 @@ pipeline {
         stage('Deploy') {
             steps {
                 bat """
+                cd %WORKDIR%
+                call %VIRTUAL_ENV%\\Scripts\\activate
                 echo Deploying application...
                 """
             }
