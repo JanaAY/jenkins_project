@@ -43,12 +43,35 @@ pipeline {
             }
         }
 
+        stage('Coverage') {
+            steps {
+                bat """
+                cd %WORKDIR%
+                call %VIRTUAL_ENV%\\Scripts\\activate
+                python -m coverage run -m pytest
+                python -m coverage report
+                """
+            }
+        }
+
+        stage('Security Scan') {
+            steps {
+                bat """
+                cd %WORKDIR%
+                call %VIRTUAL_ENV%\\Scripts\\activate
+                python -m bandit -r .
+                """
+            }
+        }
+
         stage('Deploy') {
             steps {
                 bat """
                 cd %WORKDIR%
                 call %VIRTUAL_ENV%\\Scripts\\activate
-                echo Deploying application...
+                if not exist dist mkdir dist
+                copy app.py dist\\app.py /Y
+                echo Application deployed locally to dist\\app.py
                 """
             }
         }
