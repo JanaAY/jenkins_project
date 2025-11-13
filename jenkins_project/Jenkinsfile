@@ -2,6 +2,7 @@ pipeline {
     agent any
 
     environment {
+        PYTHON = 'C:\\Users\\user\\AppData\\Local\\Python\\bin\\python.exe'
         VIRTUAL_ENV = 'venv'
     }
 
@@ -10,15 +11,15 @@ pipeline {
         stage('Setup') {
             steps {
                 script {
-                    // Create virtual environment if it doesn't exist
+                    // Create venv if it doesn't exist
                     if (!fileExists("${VIRTUAL_ENV}")) {
-                        bat "python -m venv %VIRTUAL_ENV%"
+                        bat "\"%PYTHON%\" -m venv %VIRTUAL_ENV%"
                     }
 
                     // Activate venv and install dependencies
                     bat """
                     call %VIRTUAL_ENV%\\Scripts\\activate
-                    pip install -r requirements.txt
+                    \"%PYTHON%\" -m pip install -r requirements.txt
                     """
                 }
             }
